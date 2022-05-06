@@ -1,0 +1,17 @@
+{
+    "builders": [
+        {
+            "type": "yandex",
+            "token": "{{user `token`}}",
+            "folder_id": "{{user `folder_id`}}",
+            "source_image_family": "{{user `source_image_family`}}",
+            "image_name": "image-{{timestamp}}",
+            "image_family": "reddit-base",
+            "ssh_username": "ubuntu",
+            "platform_id": "standard-v1",
+            "use_ipv4_nat" : "true",
+            "instance_cores": "2",
+            "instance_mem_gb": "4"
+        }
+    ]
+}
