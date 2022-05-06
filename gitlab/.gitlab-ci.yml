@@ -33,7 +33,7 @@
        - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
    script:
       - cd project/search_engine_crawler
-      - docker build -t crawler_backend .
+      - docker build -t gbutyaev/crawler_backend .
       - docker push gbutyaev/crawler_backend
 
 
@@ -46,7 +46,7 @@
        - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
    script:
       - cd project/search_engine_ui
-      - docker build -t crawler_ui .
+      - docker build -t gbutyaev/crawler_ui .
       - docker push gbutyaev/crawler_ui
 
 #  deploy:
