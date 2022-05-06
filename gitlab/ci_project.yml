@@ -1,0 +1,63 @@
+ stages:
+   - test
+   - build
+   - deploy
+
+
+ test_crawler :
+   stage: test
+   script:
+     - pip install -r project/search_engine_crawler/requirements.txt -r project/search_engine_crawler/requirements-test.txt
+     - cd project/search_engine_crawler
+     - python -m unittest discover -s tests/
+     - coverage run -m unittest discover -s tests/
+     - coverage report --include crawler/crawler.py
+
+
+
+ test_crawler_ui :
+   stage: test
+   script:
+      - pip install -r project/search_engine_ui/requirements.txt -r project/search_engine_ui/requirements-test.txt
+      - cd project/search_engine_ui
+      - python -m unittest discover -s tests/
+      - coverage run -m unittest discover -s tests/
+      - coverage report --include ui/ui.py
+
+
+ build_crawler_image:
+   stage: build
+   before_script:
+       - apk update
+       - apk add docker
+       - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
+   script:
+      - cd project/search_engine_crawler
+      - docker build -t crawler_backend .
+      - docker push gbutyaev/crawler_backend
+
+
+
+ build_crawler_ui_image:
+   stage: build
+   before_script:
+       - apk update
+       - apk add docker
+       - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
+   script:
+      - cd project/search_engine_ui
+      - docker build -t crawler_ui .
+      - docker push gbutyaev/crawler_ui
+
+#  deploy:
+#    stage: deploy
+#    before_script:
+#        - apk update
+#        - apk add --no-cache docker-cli python3 &&
+#        - apk add --no-cache --virtual .docker-compose-deps python3-dev libffi-dev openssl-dev gcc libc-dev make &&
+#        - pip3 install docker-compose &&
+#        - apk del .docker-compose-deps
+#        - docker login --username=$DOCKER_USER --password=$DOCKER_PASSWORD
+#    script:
+#        - cd docker-compose/
+#        - docker-compose up -d

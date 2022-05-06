@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  crawler:
+    image: crawler:v1
+    restart: always
+    container_name: crawler
+    depends_on:
+      - mongo-service
+      - rabbit-mq-service
+    environment:
+      MONGO: "mongo-service"
+      MONGO_PORT: "27017"
+      RMQ_HOST: "rabbit-mq-service"
+      RMQ_QUEUE: "crawler-rabbit"
+      RMQ_USERNAME: ${RMQ_USERNAME}
+      RMQ_PASSWORD: ${RMQ_PASSWORD}
+      CHECK_INTERVAL: "60"
+      EXCLUDE_URLS: ".*github.com"
+    command: ["https://vitkhab.github.io/search_engine_test_site/"]
+  ui:
+    image: ui:v1
+    restart: always
+    container_name: ui
+    depends_on:
+      - mongo-service
+    environment:
+      MONGO: "mongo-service"
+      MONGO_PORT: "27017"
+    ports:
+      - 8000:8000
+  mongo-service:
+    image: mongo:5.0.8
+  rabbit-mq-service:
+    image: rabbitmq:3.9.16-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
+    hostname: crawler-rabbit
