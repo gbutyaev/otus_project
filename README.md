@@ -72,7 +72,7 @@ ansible-playbook project -i inventory
 
 ### ВМ для деплоя приложения
 
-В нашем проекте сборка и деплой разделены. Поэтому добавляем гитлаб-раннер на ВМ ```deploy-vm``, Dockerfile для сборки и файлы окру
+В нашем проекте сборка и деплой разделены. Поэтому добавляем гитлаб-раннер на ВМ `deploy-vm`, Dockerfile для сборки и файлы окру
 
 ## Тестирование, Билд и Деплой
 
@@ -82,7 +82,9 @@ ansible-playbook project -i inventory
 3. Деплой. Шелл раннер выполняет деплой - поднимает docker-compose в ВМ `deploy-vm`
 
 
-
+**http://51.250.9.77/**  
+login -  root    
+passowrd -  hcQnasUAbKjGp0lk3EY26TCj2lmaFL7yqpeThvUeHf8=
 
  
 
