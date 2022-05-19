@@ -84,6 +84,8 @@ ansible-playbook project -i inventory
 3. `deploy` Shell раннер выполняет деплой - поднимает docker-compose в ВМ `deploy-vm`
 
 
+##Gitlab##
+
 **http://51.250.9.77/**  
 login -  root    
 passowrd -  hcQnasUAbKjGp0lk3EY26TCj2lmaFL7yqpeThvUeHf8=
