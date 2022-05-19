@@ -1,48 +1,84 @@
-# Crawler
+# Crawler CI/CD
 
-## Общая логика проекта
-- Инфраструктура. Исполнена при помощи инструментов packer, terraform,ansible,docker
-- Приложение разворачивается в докер компоузе , образы собираются в gitlab-ci
-
-
-
-# Настройка инфраструктуры
- ## packer
- Готовим образ ВМ `ubuntu 20.04` и деплоим его в YC  
- ## terraform  
- Разворачиваем две виртуальные машины на основе подготовленного образа   
-ВМ `project-application` - исходники проекта и докерфайлы  
-ВМ `project-gitlab` - gitlab сервер в контейнере  
- ## ansible    
-Для ВМ ``project-gitlab`` используя роль устанавливаем обновления. Сам gitlab сервер пока установлен руками  
-
-Для ВМ ``project-application`` используя роли обновляем пакеты, устанавливаем `docker,docker-compose, docker-runner`, добавляем исходные файлы нашего приложения ( для тестов ), написанные `dockerfile` и `docker-compose.yml` ( для деплоя)
+## План
+1. Подготовить образ c помощью Packer для поднятия ВМ в Terraform ( все на основе ubuntu:20.04)
+```
+packer build image_ubuntu.json
+```   
+![Скриншот 19-05-2022 185756](https://user-images.githubusercontent.com/76098648/169347329-6cb7b97e-b228-4fda-ac38-12b6f3a032e7.jpg)
 
 
 
-# Тестирование и деплой приложения
-## Gitlab CI. Docker
-Для деплоя приложения написан CI, который состоит из 2 этапов:
-- **Тестирование** `docker-runner` выполняет юнит тесты на ВМ `project-application`
-- **Cборка образов** `docker-runner` собирает 2 образа `crawler_backend` и `crawler_ui` из докер файлов и деплоит их в докер хаб  
- **Деплой** Необходимо зайти на ВМ `project-application` и поднять подготовленный `docker-compose` ( образы приложения скачиваются из докер хаба). В дальнейшем будет ci для этого этапа
+
+## 1. Подготовка инфрасруктуры  
+2. Для нашено проекта нам понадобятся 3 виртульный машины:
+- Для GitLabCI ```project-gitlab```
+- Для тестирования и сборки образов ```project-application```
+- Для деплоя пирложения ```deploy-vm```  
+
+```
+terraform plan   
+
+terraform apply -auto-approve   
+```
+
+![Скриншот 19-05-2022 191140](https://user-images.githubusercontent.com/76098648/169347885-c6026fb9-8aac-4ba3-8501-04d7b4107379.jpg)
+
+
+
+### ВМ для Gitlab-CI   
+ На ВМ `project-gitlab` разворачиваем `GitLab Omnibus` с помощью docker-compose
+
+``` 
+web:
+  image: 'gitlab/gitlab-ce:latest'
+  restart: always
+  hostname: 'gitlab.example.com'
+  environment:
+    GITLAB_OMNIBUS_CONFIG: |
+      external_url 'http://<YOUR-VM-IP>'
+  ports:
+    - '80:80'
+    - '443:443'
+    - '2222:22'
+  volumes:
+    - '/srv/gitlab/config:/etc/gitlab'
+    - '/srv/gitlab/logs:/var/log/gitlab'
+    - '/srv/gitlab/data:/var/opt/gitlab'
+```
+```
+docker-compose up -d
+```
+```
+**http://51.250.9.77/** 
+```
+
+### ВМ для Тестирования и билдов образов
+Тестирование и сборка образов будет происходить в контейнерах. Добавив на ВМ ```project-application``` Dockerfile для сборки образов, файлы окружения, установим вокер и докер раннер с помощью готовых ansible ролей:   
+
+```
+ansible-galaxy install geerlingguy.docker
+ansible-galaxy install riemers.gitlab-runner
+```
+```
+ansible-playbook project -i inventory
+```
+
+### ВМ для деплоя приложения
+
+В нашем проекте сборка и деплой разделены. Поэтому добавляем гитлаб-раннер на ВМ ```deploy-vm``, Dockerfile для сборки и файлы окру
+
+## Тестирование, Билд и Деплой
+
+Вся логика работы приложения заключена в GitLabCI и разделена на три стадии
+1. Тестирование. Докер раннер выполняет ручные тесты из склоннированного репозитория на ВМ `project-application`
+2. Билд. Докер раннер собирает образы нашего приложения - `ui` и `backend` и отправляет их `docker-hub`
+3. Деплой. Гитлаб ( shell runner) вы
+
+
+
+
  
- Проверить работоспособность приложения можно перейдя по адресу ВМ `project-application`: 
- `51.250.2.121:8000`
 
- 
- Установка Gitlab : 
- 
-**http://51.250.9.77/**  
-login -  root    
-passowd -  hcQnasUAbKjGp0lk3EY26TCj2lmaFL7yqpeThvUeHf8=
-
-Из планируемого еще сделать:
-
-- мониторинг  
-- динамические инвентори  
-- `ansible vault`
-- доработка 3 этапа в `gitlab-ci` и создание несколькоих окружений - `dev` и `prod`
-- деплой в кубер 
 
  
