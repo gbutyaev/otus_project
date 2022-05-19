@@ -1,16 +1,22 @@
 # Crawler CI/CD
 
 ## План
-1. Подготовить образ c помощью Packer для поднятия ВМ в Terraform ( все на основе ubuntu:20.04)
-```
-packer build image_ubuntu.json
-```   
-![Скриншот 19-05-2022 185756](https://user-images.githubusercontent.com/76098648/169347329-6cb7b97e-b228-4fda-ac38-12b6f3a032e7.jpg)
+1. Подготовить образ c помощью Packer 
+2. Развернуть с помощью Terraform 3 ВМ на основе образа Packer
+3. Подготовить инфраструктуру ВМ с помощью Ansible
+4. 
+5. Используя поднятый GitLabCI на одной ВМ протестировать и собрать образы
 
 
 
 
 ## 1. Подготовка инфрасруктуры  
+1. 1. Подготовить образ c помощью Packer ( все на основе ubuntu:20.04)
+![Скриншот 19-05-2022 185756](https://user-images.githubusercontent.com/76098648/169347329-6cb7b97e-b228-4fda-ac38-12b6f3a032e7.jpg)
+```
+packer build image_ubuntu.json
+``` 
+
 2. Для нашено проекта нам понадобятся 3 виртульный машины:
 - Для GitLabCI ```project-gitlab```
 - Для тестирования и сборки образов ```project-application```
