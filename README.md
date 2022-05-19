@@ -83,8 +83,7 @@ ansible-playbook project -i inventory
 2. `build` Докер раннер собирает образы нашего приложения - `ui` и `backend` и отправляет их `docker-hub`
 3. `deploy` Shell раннер выполняет деплой - поднимает docker-compose в ВМ `deploy-vm`
 
-
-##Gitlab##
+#Gitlab#
 
 **http://51.250.9.77/**  
 login -  root    
